@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：最主要的作用就是绑定mapper.xml与对应那个Mapper接口的关系，要求接口名称为：全限定名 -->
+<mapper namespace="com.example.xhfirstproject.Mapper.DepartMapper">
+    <resultMap id="deptMap" type="com.example.xhfirstproject.Demos.Department">
+        <id column="id" property="id"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="description" property="description"/>
+        <result column="address" property="address"/>
+        <collection property="users" ofType="com.example.xhfirstproject.Demos.User">
+            <result column="dept_id" property="deptId"/>
+            <result column="id" property="id"/>
+            <result column="user_name" property="userName"/>
+            <result column="password" property="password"/>
+            <result column="gender" property="gender"/>
+            <result column="birthday" property="birthday"/>
+        </collection>
+    </resultMap>
+    <select id="selectAll" resultType="com.example.xhfirstproject.Demos.Department">
+        select * from department
+    </select>
+
+    <select id="selectById" resultType="com.example.xhfirstproject.Demos.Department">
+        select * from department where id=#{id}
+    </select>
+
+    <insert id="insertToDepartment" useGeneratedKeys="true" keyProperty="id">
+        insert into department(dept_name,description,id,address) values(#{deptName},#{description},#{id},#{address})
+    </insert>
+    <insert id="insertDepartments" parameterType="list">
+        INSERT INTO department (id, dept_name, description, address)
+        VALUES
+        <foreach collection="list" item="department" separator=",">
+            (#{department.id}, #{department.deptName}, #{department.description}, #{department.address})
+        </foreach>
+    </insert>
+
+    <update id = "update">
+        update department set dept_name=#{deptName},description=#{description} where id=#{id}
+    </update>
+
+    <delete id="delete">
+        delete from department where id=#{id}
+    </delete>
+    <delete id="deleteBatchByIds" parameterType="java.util.List">
+        delete from department where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="findDeptUsers" resultMap="deptMap">
+        select
+            d.id,
+            dept_name,
+            description,
+            address,
+            u.id,
+            user_name,
+            password,
+            gender,
+            birthday,
+            dept_id
+        from
+            department d
+                left join
+            user u
+            on
+                d.id = u.dept_id
+        where
+            d.id=#{id}
+    </select>
+    <select id="findUserDeptsAll" resultMap="deptMap">
+        select
+            d.id,
+            dept_name,
+            description,
+            address,
+            u.id,
+            user_name,
+            password,
+            gender,
+            birthday,
+            dept_id
+        from
+            department d
+                left join
+            user u
+            on
+                d.id = u.dept_id
+    </select>
+
+</mapper>

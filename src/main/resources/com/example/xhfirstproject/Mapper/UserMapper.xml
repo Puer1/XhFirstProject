@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：最主要的作用就是绑定mapper.xml与对应那个Mapper接口的关系，要求接口名称为：全限定名 -->
+<mapper namespace="com.example.xhfirstproject.Mapper.UserMapper">
+    <resultMap id="UserVoResultMap" type="com.example.xhfirstproject.Demos.UserVo">
+        <result property="userName" column="user_name"/>
+        <result property="gender" column="gender"/>
+        <result property="birthday" column="birthday"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="description" column="description"/>
+        <result property="address" column="address"/>
+    </resultMap>
+
+    <select id="selectAll" resultType="com.example.xhfirstproject.Demos.User">
+        select * from user
+    </select>
+
+    <select id="selectById" resultType="com.example.xhfirstproject.Demos.User">
+        select * from user where dept_id=#{deptId}
+    </select>
+
+    <insert id="insertToUser" useGeneratedKeys="true" keyProperty="id">
+        insert into user(user_name,password,id,gender,birthday,dept_id) values(#{userName},#{password},#{id},#{gender},#{birthday},#{deptId})
+    </insert>
+
+    <insert id="insertUsers" parameterType="list">
+        INSERT INTO user (user_name, password, id, gender, birthday, dept_id)
+        VALUES
+        <foreach collection="list" item="user" separator=",">
+            (#{user.userName}, #{user.password}, #{user.id}, #{user.gender}, #{user.birthday}, #{user.deptId})
+        </foreach>
+    </insert>
+
+
+    <update id = "update">
+        update user set user_name=#{userName},password=#{password} where id=#{id}
+    </update>
+
+    <delete id="delete">
+        delete from user where id=#{id}
+    </delete>
+    <delete id="deleteBatchByIds" parameterType="java.util.List">
+    delete from user where id in
+    <foreach collection="list" item="id" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+    </delete>
+
+    <select id="selectAll1" resultMap="UserVoResultMap">
+        select
+            u.user_name,gender,birthday,dept_id,d.dept_name,description,address
+        from
+            user u
+                left join
+            department d
+            on
+                u.dept_id = d.id;
+    </select>
+    <select id="findUserDept" resultMap="UserVoResultMap">
+        select
+            u.user_name,gender,birthday,dept_id,d.dept_name,description,address
+        from
+            user u
+                left join
+            department d
+            on
+                u.dept_id = d.id
+            where
+                u.dept_id=#{deptId};
+    </select>
+</mapper>
